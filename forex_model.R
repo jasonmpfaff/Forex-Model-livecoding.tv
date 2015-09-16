@@ -13,9 +13,14 @@ install.packages("PerformanceAnalytics")
 install.packages("coda")
 install.packages("xlsx")
 install.packages("tsDyn")
+install.packages("partykit")
+install.packages("rpart")
+install.packages("evtree")
+#load base packages
+library(evtree)
+library(partykit)
 library(tsDyn)
 library(xlsx)
-#load base packages
 library(coda)
 library(MCMCpack)
 library(TTR)
@@ -29,7 +34,7 @@ library(PerformanceAnalytics)
 require(quantmod)
 require(PerformanceAnalytics)
 
-##load api key##
+##load api key##you can get a free key at Quandl.com in <2 mins##the one below is my own personal key
 Quandl.auth("TGvCqLsEZx6fqMuqAcJw")
 
 ##############bring in Bitcoin data/models#################
@@ -93,6 +98,7 @@ plot(decompose(EURTS))
 EURX<-data.frame(EURcast)
 EURtslm<-(EURX$Point.Forecast)
 EURtslm
+plot(EURtslm, col="red", pch=19, main="Euro Time Series Linear Model")
 
 JPY1<-tslm(JPYTS ~ trend + season)
 JPYcast<-forecast.lm(JPY1, h=100)
@@ -105,6 +111,7 @@ plot(decompose(JPYTS))
 JPYX<-data.frame(JPYcast)
 JPYtslm<-(JPYX$Point.Forecast)
 JPYtslm  
+plot(JPYtslm, col="red", pch=19, main="YEN Time Series Linear Model")
 
 CAD1<-tslm(CADTS ~ trend + season)
 CADcast<-forecast.lm(CAD1, h=100)
@@ -117,6 +124,7 @@ plot(decompose(CADTS),xlab ="Canadian Dollar")
 CADX<-data.frame(CADcast)
 CADtslm<-(CADX$Point.Forecast)
 CADtslm   
+plot(CADtslm, col="red", pch=19, main="Canadian Dollar Time Series Linear Model")
 
 AUD1<-tslm(AUDTS ~ trend + season)
 AUDcast<-forecast.lm(AUD1, h=100)
@@ -129,6 +137,7 @@ plot(decompose(AUDTS),xlab ="Aussie")
 AUDX<-data.frame(AUDcast)
 AUDtslm<-(AUDX$Point.Forecast)
 AUDtslm  
+plot(AUDtslm, col="red", pch=19, main="Aussie Time Series Linear Model")
 
 GBP1<-tslm(GBPTS ~ trend + season)
 GBPcast<-forecast.lm(GBP1, h=100)
@@ -141,22 +150,23 @@ plot(decompose(GBPTS),xlab ="Pound")
 GBPX<-data.frame(GBPcast)
 GBPtslm<-(GBPX$Point.Forecast)
 GBPtslm   
+plot(GPBtslm, col="red", pch=19, main="Pound Time Series Linear Model")
 
 ##########Neural Net trend indicator model
 GBPNN<-nnetTs(GBPTS,m=1, size=1)
 GBPNNPred<-predict(GBPNN, n.ahead=100)
 GBPNNPred
-plot.ts(GBPNNPred)
 GBPX1<-data.frame(GBPNNPred)
 GBPX1
- 
+plot(GBPX1, col="red", pch=19, main="Pound Neural Net trend indicator Model")
+
 EURNN<-nnetTs(EURTS,m=1, size=1)
 EURNNPred<-predict(EURNN, n.ahead=100)
 EURNNPred
 plot.ts(EURNNPred)
 EURX1<-data.frame(EURNNPred)
 EURX1
-head(EURTS)
+plot(EURX1, col="red", pch=19, main="Euro Neural Net trend indicator Model")
 
 JPYNN<-nnetTs(JPYTS,m=1, size=1)
 JPYNNPred<-predict(JPYNN, n.ahead=100)
@@ -164,6 +174,7 @@ JPYNNPred
 plot.ts(JPYNNPred)
 JPYX1<-data.frame(JPYNNPred)
 JPYX1
+plot(JPYX1, col="red", pch=19, main="YEN Neural Net trend indicator Model")
 
 CADTSNN<-nnetTs(CADTS,m=1, size=1)
 CADTSNNPred<-predict(CADTSNN, n.ahead=100)
@@ -171,6 +182,7 @@ CADTSNNPred
 plot.ts(CADTSNNPred)
 CADX1<-data.frame(CADTSNNPred)
 CADX1
+plot(CADX1, col="red", pch=19, main="Canadian Neural Net trend indicator Model")
 
 AUDTSNN<-nnetTs(AUDTS,m=1, size=1)
 AUDTSNNPred<-predict(AUDTSNN, n.ahead=100)
@@ -178,13 +190,14 @@ AUDTSNNPred
 plot.ts(AUDTSNNPred)
 AUDX1<-data.frame(AUDTSNNPred)
 AUDX1
+plot(AUDX1, col="red", pch=19, main="Aussie Neural Net trend indicator Model")
 
 BitNN<-nnetTs(BitcoinTS,m=5, size=5)
 BitNNPred<-predict(BitNN, n.ahead=100)
 BitNNPred
 BitX1<-data.frame(BitNNPred)
 BitX1
-
+plot(BitX1, col="red", pch=19, main="Bitcoin Neural Net trend indicator Model")
 
 
 #######################################stl model#####################################
@@ -192,119 +205,97 @@ EURstl<-stlf(EURTS,h=100, t.window=15, s.window="periodic", robust=TRUE)
 plot(EURstl, col="blue")
 EURstldf<-data.frame(EURstl)
 EURstldf
+EURstldf1<-(EURstldf$Point.Forecast)
 plot.forecast(EURstl, main="EURO forecast", col="orange")
 
 JPYstl<-stlf(JPYTS,h=100, t.window=15, s.window="periodic", robust=TRUE)
 plot(JPYstl, col="blue")
 JPYstldf<-data.frame(JPYstl)
 JPYstldf1<-(JPYstldf$Point.Forecast)
-JPYstldf1
 plot.forecast(JPYstl, main="YEN forecast", col="orange")
 
 GBPstl<-stlf(GBPTS,h=100, t.window=15, s.window="periodic", robust=TRUE)
 plot(GBPstl, col="blue")
 GBPstldf<-data.frame(GBPstl)
-head(GBPstldf)
+GBPstldf1<-(GBPstldf$Point.Forecast)
 plot.forecast(GBPstl, main="GBP forecast", col="orange")
 
 BITstl<-stlf(BitcoinTS,h=100, t.window=15, s.window="periodic", robust=TRUE)
 plot(BITstl, col="blue")
 BITstldf<-data.frame(BITstl)
 BITstldf
+BITstldf1<-(BITstldf$Point.Forecast)
 plot.forecast(BITstl, main="Bitcoin", col="orange")
 
 CADstl<-stlf(GBPTS,h=100, t.window=15, s.window="periodic", robust=TRUE)
 plot(CADstl, col="blue")
 CADstldf<-data.frame(CADstl)
-head(CADstldf)
+CADstldf1<-(CADstldf$Point.Forecast)
 plot.forecast(CADstl, main="GBP forecast", col="orange")
 
 AUDstl<-stlf(AUDTS,h=100, t.window=15, s.window="periodic", robust=TRUE)
 plot(AUDstl, col="blue")
 AUDstldf<-data.frame(AUDstl)
-head(AUDstldf)
+AUDstldf1<-(AUDstldf$Point.Forecast)
 plot.forecast(AUDstl, main="GBP forecast", col="orange")
 
 stldf<-data.frame(EURstldf$Point.Forecast,JPYstldf$Point.Forecast,GBPstldf$Point.Forecast)
 colnames(stldf)<-c("Euro", "Yen", "GBP")
 write.xlsx(c(stldf),"\\\\deltafile01/DeltaUsers/001VIR/NonVABeach/jason.pfaff/My Documents/mydata.xlsx")
 
-stageoneframe<-data.frame(BITtslm, EURtslm,JPYtslm, AUDtslm, CADtslm, GBPtslm, GBPX1, EURX1, JPYX1, AUDX1, CADX1, BitX1, EURstldf, GBPstldf, JPYstldf, AUDstldf, CADstldf, BITstldf)
-colnames(stageoneframe)<-c("BITtslm", "Eurotslm", "Yentslm", "AUDtslm", "CADtslm", "GBPtslm", "GBPnnet", "Euronnet", "JPYnnet", "AUDnnet", "CADnnet", "Bitnnet", "EURstl", "GBPstl", "JPYstl", "AUDstl", "CADstl", "BITstl")
-write.xlsx(c(stageoneframe),"\\\\deltafile01/DeltaUsers/001VIR/NonVABeach/jason.pfaff/My Documents/mydata.xlsx")
-
-BITtslm
-EURtslm
-JPYtslm
-AUDtslm
-CADtslm
-GBPtslm
-GBPX1
-EURX1
-JPYX1
-AUDX1
-CADX1
-BitX1
-EURstldf
-GBPstldf
-JPYstldf
-AUDstldf
-CADstldf
-BITstldf
-
-
-
 ###############################stlmodel##########################################
 
 ################################Core arima model########################
 
-GBPdiff1<-diff(GBPTS, differences=1)
 GBPtimeseriesarima<-arima(GBPTS, order=c(1,0,1))
 GBPtimeseriesarima
 GBPtimeseriesforecasts<-forecast.Arima(GBPtimeseriesarima, h=100)
 GBPtimeseriesforecasts
+GBPtimeseriesforecasts1<-data.frame(GBPtimeseriesforecasts)
+GBPArima<-(GBPtimeseriesforecasts1$Point.Forecast)
+
+GBPdiff1<-diff(GBPTS, differences=1)
 plot(GBPtimeseriesforecasts, main="GBP Forecast")
 acf(GBPdiff1, lag.max=20, main="Lag of model differences")
 acf(GBPdiff1, lag.max=20, plot=FALSE)
 plot.ts(GBPdiff1, main="Plot of Differeneces")
 plot.forecast(GBPtimeseriesforecasts)
 
-EURTSdiff1<-diff(EURTS, differences=1)
 EURTStimeseriesarima<-arima(EURTS, order=c(1,0,1))
 EURTStimeseriesarima
 EURTStimeseriesforecasts<-forecast.Arima(EURTStimeseriesarima, h=100)
 EURTStimeseriesforecasts
+EURTStimeseriesforecasts1<-data.frame(EURTStimeseriesforecasts)
+EURArima<-(EURTStimeseriesforecasts1$Point.Forecast)
+
+EURTSdiff1<-diff(EURTS, differences=1)
 acf(EURTSdiff1, lag.max=20, main="Lag of model differences")
 acf(EURTSdiff1, lag.max=20, plot=FALSE)
 plot.ts(EURTSdiff1, main="Plot of Differeneces")
 plot.forecast(EURTStimeseriesforecasts)
 
-CADTSdiff1<-diff(CADTS, differences=1)
-EURTStimeseriesarima<-arima(EURTS, order=c(1,0,1))
-EURTStimeseriesarima
-EURTStimeseriesforecasts<-forecast.Arima(EURTStimeseriesarima, h=100)
-EURTStimeseriesforecasts
-plot(EURTStimeseriesforecasts, main="EURO Forecast")
-CADTStimeseriesarima<-auto.arima(CADTS)
+CADTStimeseriesarima<-arima(CADTS, order=c(1,0,1))
 CADTStimeseriesarima
 CADTStimeseriesforecasts<-forecast.Arima(CADTStimeseriesarima, h=100)
 CADTStimeseriesforecasts
+CADTStimeseriesforecasts1<-data.frame(CADTStimeseriesforecasts)
+CADArima<-(CADTStimeseriesforecasts1$Point.Forecast)
+
+CADTSdiff1<-diff(CADTS, differences=1)
 plot(CADTStimeseriesforecasts, main="Canadian Dollar Forecast")
 acf(CADTSdiff1, lag.max=20, main="Lag of model differences")
 acf(CADTSdiff1, lag.max=20, plot=FALSE)
 plot.ts(CADTSdiff1, main="Plot of Differeneces")
 plot.forecast(CADTStimeseriesforecasts)
 
-AUDTSDiff1<-diff(AUDTS, differences=1)
-EURTStimeseriesarima<-arima(EURTS, order=c(1,0,1))
-EURTStimeseriesarima
-EURTStimeseriesforecasts<-forecast.Arima(EURTStimeseriesarima, h=100)
-EURTStimeseriesforecasts
-plot(EURTStimeseriesforecasts, main="EURO Forecast")
-AUDTStimeseriesarima<-auto.arima(AUDTS)
+AUDTStimeseriesarima<-arima(AUDTS, order=c(1,0,1))
 AUDTStimeseriesarima
 AUDTStimeseriesforecasts<-forecast.Arima(AUDTStimeseriesarima, h=100)
 AUDTStimeseriesforecasts
+AUDTStimeseriesforecasts1<-data.frame(AUDTStimeseriesforecasts)
+AUDArima<-(AUDTStimeseriesforecasts1$Point.Forecast)
+
+AUDTSDiff1<-diff(AUDTS, differences=1)
 plot(AUDTStimeseriesforecasts, main="Aussie Forecast")
 acf(AUDTSdiff1, lag.max=20, main="Lag of model differences")
 acf(AUDTSdiff1, lag.max=20, plot=FALSE)
@@ -312,36 +303,44 @@ plot.ts(AUDTSdiff1, main="Plot of Differeneces")
 plot.forecast(AUDTStimeseriesforecasts)
 
 JPYTSDiff1<-diff(JPYTS, differences=1)
-EURTStimeseriesarima<-arima(EURTS, order=c(1,0,1))
-EURTStimeseriesarima
-EURTStimeseriesforecasts<-forecast.Arima(EURTStimeseriesarima, h=100)
-EURTStimeseriesforecasts
-plot(EURTStimeseriesforecasts, main="EURO Forecast")
-JPYTStimeseriesarima<-auto.arima(JPYTS)
+JPYTStimeseriesarima<-arima(JPYS, order=c(1,0,1))
 JPYTStimeseriesarima
 JPYTStimeseriesforecasts<-forecast.Arima(JPYTStimeseriesarima, h=100)
 JPYTStimeseriesforecasts
+JPYTStimeseriesforecasts1<-data.frame(JPYTStimeseriesforecasts)
+JPYArima<-(JPYTStimeseriesforecasts1$Point.Forecast)
+
 plot(JPYTStimeseriesforecasts, main="Japan Forecast")
 acf(JPYTSdiff1, lag.max=20, main="Lag of model differences")
 acf(JPYTSdiff1, lag.max=20, plot=FALSE)
 plot.ts(JPYTSdiff1, main="Plot of Differeneces")
 plot.forecast(JPYTStimeseriesforecasts)
 
-BTC<-diff(BTCTS, differences=1)
-BTCTStimeseriesarima<-arima(BTCTS, order=c(1,0,1))
+BTCTStimeseriesarima<-arima(BitcoinTS, order=c(1,0,1))
 BTCTStimeseriesarima
 BTCTStimeseriesforecasts<-forecast.Arima(BTCTStimeseriesarima, h=100)
 BTCTStimeseriesforecasts
-plot(BTCTStimeseriesforecasts, main="EURO Forecast")
-BTCTStimeseriesarima<-auto.arima(BTCTS)
-BTCTStimeseriesarima
-BTCTStimeseriesforecasts<-forecast.Arima(BTCTStimeseriesarima, h=100)
-BTCTStimeseriesforecasts
+BTCTStimeseriesforecasts1<-data.frame(BTCTStimeseriesforecasts)
+BTCArima<-(BTCTStimeseriesforecasts1$Point.Forecast)
+
+BTCTSdiff1<-diff(BitcoinTS, differences=1)
 plot(BTCTStimeseriesforecasts, main="Japan Forecast")
 acf(BTCTSdiff1, lag.max=20, main="Lag of model differences")
 acf(BTCTSdiff1, lag.max=20, plot=FALSE)
 plot.ts(BTCTSdiff1, main="Plot of Differeneces")
 plot.forecast(BTCTStimeseriesforecasts)
+
+stageoneframe<-data.frame(BITtslm, EURtslm,JPYtslm, AUDtslm, CADtslm, GBPtslm, GBPX1, EURX1, JPYX1, AUDX1, CADX1, BitX1, EURstldf1, GBPstldf1, JPYstldf1, AUDstldf1, CADstldf1, BITstldf1, GBPArima, EURArima, CADArima, AUDArima, BTCArima, JPYArima)
+colnames(stageoneframe)<-c("BITtslm", "Eurotslm", "Yentslm", "AUDtslm", "CADtslm", "GBPtslm", "GBPnnet", "Euronnet", "JPYnnet", "AUDnnet", "CADnnet", "Bitnnet", "EURstl", "GBPstl", "JPYstl", "AUDstl", "CADstl", "BITstl", "GBPArima", "EURArima", "CADArima", "AUDArima", "BTCArima", "JPYArima") 
+write.xlsx(c(stageoneframe),"\\\\deltafile01/DeltaUsers/001VIR/NonVABeach/jason.pfaff/My Documents/mydata.xlsx")
+
+# EUROLD<-data  5/1/15 to 100 days out
+# EUROLDDF<-data.frame(EOROLD)
+# EUROLDElement<-(EOROLD$EUR)
+# 
+# reset quandl to end at 5/1/15
+# 
+# EURactual<-lm(EURTS~EURnnet+EURArima+EURstlf+EURtslm, data=EUROLD)
 
 ################################Core arima model########################
 
